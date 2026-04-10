@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine
+import os
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import psycopg2
@@ -6,8 +7,18 @@ from psycopg2.extras import RealDictCursor
 import time
 from .config import settings
 
-SQLALCHEMY_DATABASE_URL = f'postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}'
 
+# SQLALCHEMY_DATABASE_URL = f'postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}'
+
+# Start render changes
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Fix for SQLAlchemy
+SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace(
+    "postgresql://", "postgresql+psycopg2://"
+)
+
+# End render changes
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
